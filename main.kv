@@ -1,0 +1,955 @@
+#:kivy 2.1.0
+#:import C kivy.utils.get_color_from_hex
+
+WindowManager:
+    SplashWindow:
+    LoginWindow:
+    RegisterWindow:
+    MenuWindow:
+
+    UmumWindow:
+    PersonalWindow:
+    KegiatanWindow:
+    KasWindow:
+    TagihanWindow:
+    VotingWindow:
+    DaruratWindow:
+
+    TugasManagementWindow:
+    BeritaWargaWindow:
+    DaftarWargaWindow:
+
+    PengajuanDokumenWindow:
+    PelaporanMasalahWindow:
+
+    PengurusVoteWindow:
+    SolusiVoteWindow:
+
+# ---------------------------------------- reusable widgets ---------------------------------------- #
+<BackToMenuButton@MDIconButton>:
+    icon: "arrow-left-circle"
+    pos_hint: {"center": (0.1, 0.9)}
+    on_release:
+        self.parent.parent.manager.current = "menu"
+        self.parent.parent.manager.transition.direction = "right"
+
+<TemplateWindow@MDFloatLayout>:
+    size: root.width, root.height
+
+    # -------------- label -------------- #
+    MDLabel:
+        text: root.template_label
+        markup: True
+        halign: "center"
+        size_hint: (1, 0.3)
+        pos_hint: {"center": (0.5, 0.9)}
+
+    # -------------- logo -------------- #
+    MDGridLayout:
+        cols: 1
+        size_hint: (None, 0.4)
+        pos_hint: {"center": (0.5, 0.75)}
+        Image:
+            source: root.template_source
+
+<RegisterTextField@MDTextField>:
+    hint_text: root.hint_text
+    # helper_text: root.helper_text
+    # helper_text_mode: "persistent"
+    mode: "round"
+    multiline: False
+    size_hint_x: 0.25
+
+<PengurusListItem>:
+    IconLeftWidget:
+        icon: root.icon
+    RightCheckbox:
+        group: "pengurus"
+        active: False
+
+# ---------------------------------------- windows ---------------------------------------- #
+<SplashWindow>:
+    name: "splash"
+
+    MDFloatLayout:
+        size: root.width, root.height
+        md_bg_color: (255/255, 145/255, 77/255, 1)
+
+        Image:
+            source: "./images/logo.png"
+            pos_hint: {"center": (0.5, 0.5)}
+
+<LoginWindow>:
+    name: "login"
+    username: username
+    passwd: passwd
+    false_cred: false_cred
+
+    MDFloatLayout:
+        md_bg_color: (1, 1, 1, 1)
+        size: root.width, root.height
+
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.4)
+            pos_hint: {"center": (0.5, 0.8)}
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            
+            Image:
+                source: "./images/logo.png"
+
+        MDGridLayout:
+            cols: 1
+            size_hint: (0.75, 0.5)
+            pos_hint: {"center": (0.5, 0.25)}
+            spacing: (20, 30)
+
+            # -------------- input username -------------- #
+            MDTextField:
+                id: username
+                hint_text: "NIK/Email/No. Telp"
+                helper_text: "NIK/Email/No. Telp"
+                helper_text_mode: "persistent"
+                mode: "round"
+                multiline: False
+
+            # -------------- password field -------------- #
+            MDFloatLayout:
+                size: self.parent.size
+
+                # -------------- input password -------------- #
+                MDTextField:
+                    id: passwd
+                    hint_text: "Sandi"
+                    helper_text: "Sandi"
+                    helper_text_mode: "persistent"
+                    mode: "round"
+                    pos_hint: {"center": (0.5, 0.9)}
+                    multiline: False
+                    password: True
+
+                # -------------- show password -------------- #
+                MDIconButton:
+                    id: show_passwd_img
+                    icon: "eye"
+                    pos_hint: {"center": (0.97, 0.9)}
+                    on_release:
+                        root.show_pass()
+
+        # ------------- login button -------------- #
+        MDFillRoundFlatButton:
+            text: "Masuk"
+            size_hint: (0.3, 0.05)
+            pos_hint: {"center": (0.5, 0.2)}
+            background_color: (0, 0, 0, 0)
+            on_release:
+                root.manager.current = "menu" if root.login() == True else "login"
+                root.manager.transition.direction = "left"
+
+        Label:
+            id: false_cred
+            text: ""
+            color: (0.8, 0.1, 0, 1)
+            pos_hint: {"center": (0.5, 0.15)}
+        
+        # -------------- label belum punya akun -------------- #
+        Label:
+            text: "Belum Punya Akun?"
+            color: (0, 0, 0, 1)
+            pos_hint: {"center": (0.5, 0.1)}
+
+        Label:
+            text: "[ref=some]Daftar Disini.[/ref]"
+            markup: True
+            color: (33/255, 150/255, 243/255, 255/255)
+            pos_hint: {"center": (0.5, 0.07)}
+            on_ref_press:
+                app.root.current = "register"
+                root.manager.transition.direction = "left"
+
+<RegisterWindow>:
+    name: "register"
+    full_name: full_name
+    passwd: passwd
+    verif_passwd: verif_passwd
+    nik: nik
+    email: email
+    telp: telp
+    provinsi: provinsi
+    kab_kota: kab_kota
+    kecamatan: kecamatan
+    kelurahan: kelurahan
+    rw: rw
+    rt: rt
+    show_passwd_img: show_passwd_img
+    show_verif_passwd_img: show_verif_passwd_img
+    false_cred: false_cred
+
+    MDFloatLayout:
+        size: root.width, root.height
+        md_bg_color: (1, 1, 1, 1)
+
+        # -------------- full name -------------- #
+        RegisterTextField:
+            id: full_name
+            hint_text: "Nama Lengkap"
+            # helper_text: "Masukan Nama Lengkap Anda"
+            pos_hint: {"center": (0.3, 0.8)}
+
+        # -------------- password -------------- #
+        MDFloatLayout:
+            size: self.parent.size
+
+            # -------------- input password -------------- #
+            RegisterTextField:
+                id: passwd
+                hint_text: "Sandi"
+                # helper_text: "Sandi Minimal 8 Karakter"
+                password: True
+                pos_hint: {"center": (0.3, 0.7)}
+
+            # -------------- show password -------------- #
+            MDIconButton:
+                id: show_passwd_img
+                icon: "eye"
+                pos_hint: {"center": (0.42, 0.7)}
+                on_release:
+                    root.show_pass()
+
+        # -------------- konfirmasi password -------------- #
+        MDFloatLayout:
+            size: self.parent.size
+
+            # -------------- input password -------------- #
+            RegisterTextField:
+                id: verif_passwd
+                hint_text: "Konfirmasi Sandi"
+                # helper_text: "Silakan Ulangi Sandi Anda Seperti Diatas"
+                password: True
+                pos_hint: {"center": (0.3, 0.6)}
+
+            # -------------- show password -------------- #
+            MDIconButton:
+                id: show_verif_passwd_img
+                icon: "eye"
+                pos_hint: {"center": (0.42, 0.6)}
+                on_release:
+                    root.show_verif_pass()
+
+        # -------------- nik -------------- #
+        RegisterTextField:
+            id: nik
+            hint_text: "NIK"
+            # helper_text: "Masukan NIK (Nomor Induk Kependudukan) Anda"
+            pos_hint: {"center": (0.3, 0.5)}
+
+        # -------------- email -------------- #
+        RegisterTextField:
+            id: email
+            hint_text: "Email"
+            # helper_text: "Masukan Alamat Email Anda"
+            pos_hint: {"center": (0.3, 0.4)}
+
+        # -------------- telpon -------------- #
+        RegisterTextField:
+            id: telp
+            hint_text: "No. Telepon"
+            # helper_text: "Silakan Masukan No. Telepon Anda"
+            pos_hint: {"center": (0.3, 0.3)}
+
+        # -------------- provinsi -------------- #
+        RegisterTextField:
+            id: provinsi
+            hint_text: "Provinsi"
+            # helper_text: "Silakan Masukan Provinsi Anda"
+            pos_hint: {"center": (0.7, 0.8)}
+        
+        # -------------- kab/kota -------------- #
+        RegisterTextField:
+            id: kab_kota
+            hint_text: "Kabupaten/Kota"
+            # helper_text: "Silakan Masukan Kabupaten/Kota Anda"
+            pos_hint: {"center": (0.7, 0.7)}
+
+        # -------------- kecamatan -------------- #
+        RegisterTextField:
+            id: kecamatan
+            hint_text: "Kecamatan"
+            # helper_text: "Silakan Masukan Kecamatan Anda"
+            pos_hint: {"center": (0.7, 0.6)}
+        
+        # -------------- kelurahan -------------- #
+        RegisterTextField:
+            id: kelurahan
+            hint_text: "Kelurahan"
+            # helper_text: "Silakan Masukan Kelurahan Anda"
+            pos_hint: {"center": (0.7, 0.5)}
+        
+        # -------------- rw -------------- #
+        RegisterTextField:
+            id: rw
+            hint_text: "RW"
+            # helper_text: "Silakan Masukan RT Anda"
+            pos_hint: {"center": (0.7, 0.4)}
+
+        # -------------- rt/rw -------------- #
+        RegisterTextField:
+            id: rt
+            hint_text: "RT"
+            # helper_text: "Silakan Masukan RW Anda"
+            pos_hint: {"center": (0.7, 0.3)}
+
+        # -------------- tombol daftar -------------- #
+        MDFillRoundFlatButton:
+            text: "Daftar"
+            size_hint: 0.3, 0.05
+            pos_hint: {"center": (0.5, 0.2)}
+            background_color: (0, 0, 0, 0)
+            on_release:
+                root.register()
+
+        Label:
+            id: false_cred
+            text: ""
+            color: (0.8, 0.1, 0, 1)
+            pos_hint: {"center": (0.5, 0.15)}
+
+        # -------------- label untuk login -------------- #
+        Label:
+            text: "Sudah Punya Akun?"
+            color: (0, 0, 0, 1)
+            pos_hint: {"center": (0.5, 0.1)}
+
+        Label:
+            text: "[ref=some]Login Disini.[/ref]"
+            markup: True
+            color: (0, 0.5, 1, 1)
+            pos_hint: {"center": (0.5, 0.07)}
+            on_ref_press:
+                app.root.current = "login"
+                root.manager.transition.direction = "right"
+
+<MenuWindow>:
+    name: "menu"
+    welcome: welcome
+    schedule: schedule
+
+    MDFloatLayout:
+        size: root.width, root.height
+        md_bg_color: (1, 1, 1, 1)
+
+        # -------------- kata sambutan -------------- #
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.1)
+            pos_hint: {"center": (0.5, 0.95)}
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            MDLabel:
+                id: welcome
+                markup: True
+                halign: "left"
+
+        # -------------- umum -------------- #
+        MDIconButton:
+            icon: "./images/umum.png"
+            pos_hint: {"center": (0.2, 0.8)}
+            on_release:
+                root.manager.current = "umum"
+                root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Umum"
+            pos_hint: {"center": (0.2, 0.74)}
+            size_hint: (0.2, 0.1)
+            halign: "center"
+            on_release:
+                root.manager.current = "umum"
+                root.manager.transition.direction = "left"
+
+        # -------------- personal -------------- #
+        MDIconButton:
+            icon: "./images/personal.png"
+            pos_hint: {"center": (0.4, 0.8)}
+            on_release:
+                root.manager.current = "personal"
+                root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Personal"
+            pos_hint: {"center": (0.4, 0.74)}
+            size_hint: (0.2, 0.1)
+            halign: "center"
+            on_release:
+                root.manager.current = "personal"
+                root.manager.transition.direction = "left"
+
+        # -------------- kegiatan -------------- #
+        MDIconButton:
+            icon: "./images/kegiatan.png"
+            pos_hint: {"center": (0.6, 0.8)}
+            on_release:
+                root.manager.current = "kegiatan"
+                root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Kegiatan"
+            pos_hint: {"center": (0.6, 0.74)}
+            size_hint: (0.2, 0.1)
+            halign: "center"
+            on_release:
+                root.manager.current = "kegiatan"
+                root.manager.transition.direction = "left"
+
+        # -------------- uang kas -------------- #
+        MDIconButton:
+            icon: "./images/uang kas.png"
+            pos_hint: {"center": (0.8, 0.8)}
+            on_release:
+                root.manager.current = "kas"
+                root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Uang Kas"
+            halign: "center"
+            pos_hint: {"center": (0.8, 0.74)}
+            size_hint: (0.2, 0.1)
+            on_release:
+                root.manager.current = "kas"
+                root.manager.transition.direction = "left"
+
+        # ----------------- tagihan ----------------- #
+        MDIconButton:
+            icon: "./images/tagihan.png"
+            pos_hint: {"center": (0.2, 0.6)}
+            on_release:
+                root.manager.current = "tagihan"
+                root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Tagihan"
+            pos_hint: {"center": (0.2, 0.54)}
+            size_hint: (0.2, 0.1)
+            halign: "center"
+            on_release:
+                root.manager.current = "tagihan"
+                root.manager.transition.direction = "left"
+
+        # -------------- voting -------------- #
+        MDIconButton:
+            icon: "./images/voting.png"
+            pos_hint: {"center": (0.4, 0.6)}
+            on_release:
+                root.manager.current = "voting"
+                root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Voting"
+            pos_hint: {"center": (0.4, 0.54)}
+            size_hint: (0.2, 0.1)
+            halign: "center"
+            on_release:
+                root.manager.current = "voting"
+                root.manager.transition.direction = "left"
+
+        # -------------- darurat -------------- #
+        MDIconButton:
+            icon: "./images/darurat.png"
+            pos_hint: {"center": (0.6, 0.6)}
+            on_release:
+                root.manager.current = "darurat"
+                root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Darurat"
+            pos_hint: {"center": (0.6, 0.54)}
+            size_hint: (0.2, 0.1)
+            halign: "center"
+            on_release:
+                root.manager.current = "darurat"
+                root.manager.transition.direction = "left"
+
+        # ----------------- transaksi ----------------- #
+        MDIconButton:
+            icon: "./images/transaksi.png"
+            pos_hint: {"center": (0.8, 0.6)}
+            # on_release:
+            #     root.manager.current = "transaksi"
+            #     root.manager.transition.direction = "left"
+        MDTextButton:
+            text: "Coming Soon"
+            pos_hint: {"center": (0.8, 0.54)}
+            size_hint: (0.2, 0.1)
+            halign: "center"
+            # on_release:
+            #     root.manager.current = "transaksi"
+            #     root.manager.transition.direction = "left"
+
+        # ----------------- jadwal ----------------- #
+        MDGridLayout:
+            cols: 1
+            md_bg_color: (0, 0, 0, 1)
+            size_hint: (1, 0.1)
+            pos_hint: {"center": (0.5, 0.45)}
+            MDLabel:
+                text: "[color=#FFFFFF]Jadwal[/color]"
+                markup: True
+                halign: "center"
+
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.42)
+            pos_hint: {"center": (0.5, 0.21)}
+            ScrollView:
+                MDList:
+                    id: schedule
+
+<UmumWindow>:
+    name: "umum"
+
+    TemplateWindow:
+        template_label: "Umum"
+        template_source: "./images/umum.png"
+        BackToMenuButton:
+
+        # -------------- tugas management rt/rw -------------- #
+        MDFillRoundFlatButton:
+            text: "Tugas Management RT/RW"
+            pos_hint: {"center": (0.5, 0.6)}
+            size_hint: (0.5, 0.1)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.manager.current = "tugasmanagement"
+                root.manager.transition.direction = "left"
+
+        # -------------- berita warga -------------- #
+        MDFillRoundFlatButton:
+            text: "Berita Warga"
+            pos_hint: {"center": (0.5, 0.4)}
+            size_hint: (0.5, 0.1)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.manager.current = "beritawarga"
+                root.manager.transition.direction = "left"
+
+        # -------------- daftar warga -------------- #
+        MDFillRoundFlatButton:
+            text: "Daftar Warga (Coming Soon)"
+            pos_hint: {"center": (0.5, 0.2)}
+            size_hint: (0.5, 0.1)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            # on_release:
+            #     root.manager.current = "daftarwarga"
+            #     root.manager.transition.direction = "left"
+
+<TugasManagementWindow>:
+    name: "tugasmanagement"
+    list_tugas: list_tugas
+
+    TemplateWindow:
+        template_label: "Tugas Management"
+        template_source: "./images/umum.png"
+
+        MDIconButton:
+            icon: "arrow-left-circle"
+            pos_hint: {"center": (0.1, 0.9)}
+            on_release:
+                root.manager.current = "umum"
+                root.manager.transition.direction = "right"
+
+        # -------------- tugas management rt/rw -------------- #
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.6)
+            pos_hint: {"center": (0.5, 0.3)}
+            ScrollView:
+                MDList:
+                    id: list_tugas
+
+<BeritaWargaWindow>:
+    name: "beritawarga"
+    list_berita: list_berita
+
+    TemplateWindow:
+        template_label: "Berita Warga"
+        template_source: "./images/umum.png"
+
+        MDIconButton:
+            icon: "arrow-left-circle"
+            pos_hint: {"center": (0.1, 0.9)}
+            on_release:
+                root.manager.current = "umum"
+                root.manager.transition.direction = "right"
+            
+        # -------------- berita warga -------------- #
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.6)
+            pos_hint: {"center": (0.5, 0.3)}
+            ScrollView:
+                MDList:
+                    id: list_berita
+
+<DaftarWargaWindow>:
+    name: "daftarwarga"
+
+<PersonalWindow>:
+    name: "personal"
+    status_laporan: status_laporan
+
+    TemplateWindow:
+        template_label: "Personal"
+        template_source: "./images/personal.png"
+        BackToMenuButton:
+
+        # -------------- pengajuan dokumen -------------- #
+        MDFillRoundFlatButton:
+            text: "Pengajuan Dokumen"
+            pos_hint: {"center": (0.5, 0.6)}
+            size_hint: (0.5, 0.1)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.manager.current = "pengajuandokumen"
+                root.manager.transition.direction = "left"
+        
+        # -------------- pelaporan masalah -------------- #
+        MDFillRoundFlatButton:
+            text: "Pelaporan Masalah"
+            pos_hint: {"center": (0.5, 0.45)}
+            size_hint: (0.5, 0.1)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.manager.current = "pelaporanmasalah"
+                root.manager.transition.direction = "left"
+        
+        # -------------- status pengajuan laporan -------------- #
+        MDGridLayout:
+            cols: 1
+            md_bg_color: (0, 0, 0, 1)
+            size_hint: (1, 0.08)
+            pos_hint: {"center": (0.5, 0.34)}
+            MDLabel:
+                text: "[color=#FFFFFF]Status Pengajuan Laporan[/color]"
+                markup: True
+                halign: "center"
+
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.3)
+            pos_hint: {"center": (0.5, 0.15)}
+            ScrollView:
+                MDList:
+                    id: status_laporan
+
+<PengajuanDokumenWindow>:
+    name: "pengajuandokumen"
+    pengajuanktp: pengajuanktp
+    kalendar: kalendar
+
+    TemplateWindow:
+        template_label: "Pengajuan Dokumen"
+        template_source: "./images/personal.png"
+
+        MDIconButton:
+            icon: "arrow-left-circle"
+            pos_hint: {"center": (0.1, 0.9)}
+            on_release:
+                root.manager.current = "personal"
+                root.manager.transition.direction = "right"
+
+        # -------------- pengajuan dokumen -------------- #
+        MDGridLayout:
+            cols: 2
+            size_hint: (0.3, 0.2)
+            pos_hint: {"center": (0.6, 0.5)}
+            MDCheckbox:
+                id: pengajuanktp
+                size_hint: (0.2, 0.2)
+                active: False
+                on_active:
+                    root.on_checkbox_active(*args)
+            MDLabel:
+                text: "KTP"
+                halign: "left"
+
+            MDCheckbox:
+                # id: pengajuanktp
+                size_hint: (0.2, 0.2)
+                active: False
+                on_active:
+                    root.on_checkbox_active(*args)
+            MDLabel:
+                text: "Coming Soon"
+                halign: "left"
+
+        MDLabel:
+            id: kalendar
+            markup: True
+            halign: "center"
+            size_hint: (0.5, 0.1)
+            pos_hint: {"center": (0.5, 0.3)}
+
+        MDFillRoundFlatButton:
+            text: "Pilih Tanggal Pertemuan"
+            size_hint: (0.5, 0.05)
+            pos_hint: {"center": (0.5, 0.2)}
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.show_date_picker()
+        
+        MDFillRoundFlatButton:
+            text: "Ajukan"
+            size_hint: (0.5, 0.05)
+            pos_hint: {"center": (0.5, 0.1)}
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.ajukan()
+
+<PelaporanMasalahWindow>:
+    name: "pelaporanmasalah"
+    nama_masalah: nama_masalah
+    tanggal_kejadian: tanggal_kejadian
+    deskripsi: deskripsi
+    
+    TemplateWindow:
+        template_label: "Pelaporan Masalah"
+        template_source: "./images/personal.png"
+
+        MDIconButton:
+            icon: "arrow-left-circle"
+            pos_hint: {"center": (0.1, 0.9)}
+            on_release:
+                root.manager.current = "personal"
+                root.manager.transition.direction = "right"
+        
+        # -------------- pelaporan masalah -------------- #
+        MDGridLayout:
+            cols: 1
+            size_hint: (0.8, 0.3)
+            pos_hint: {"center": (0.5, 0.45)}
+
+            MDTextField:
+                id: nama_masalah
+                hint_text: "Nama Masalah"
+                mode: "rectangle"
+                multiline: False
+            MDTextField:
+                id: tanggal_kejadian
+                hint_text: "Tanggal Kejadian"
+                mode: "rectangle"
+                multiline: False
+            MDTextField:
+                id: deskripsi
+                hint_text: "Deskripsi"
+                mode: "rectangle"
+                multiline: True
+                max_height: "100dp"
+        
+        MDFillRoundFlatButton:
+            text: "Laporkan"
+            size_hint: (0.3, 0.05)
+            pos_hint: {"center": (0.5, 0.1)}
+            background_color: (0, 0, 0, 0)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.laporkan()
+
+
+<KegiatanWindow>:
+    name: "kegiatan"
+    tabel_kegiatan: tabel_kegiatan
+
+    TemplateWindow:
+        template_label: "Kegiatan"
+        template_source: "./images/kegiatan.png"
+        BackToMenuButton:
+            on_release:
+                root.manager.current = "umum"
+                root.manager.transition.direction = "right"
+    
+        # -------------- tabel kegiatan -------------- #
+        MDGridLayout:
+            cols: 1
+            md_bg_color: (0, 0, 0, 1)
+            size_hint: (1, 0.08)
+            pos_hint: {"center": (0.5, 0.6)}
+            MDLabel:
+                text: "[color=#FFFFFF]Tabel Kegiatan[/color]"
+                markup: True
+                halign: "center"
+
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.56)
+            pos_hint: {"center": (0.5, 0.28)}
+            ScrollView:
+                MDList:
+                    id: tabel_kegiatan
+
+<KasWindow>:
+    name: "kas"
+    riwayat_kas: riwayat_kas
+
+    TemplateWindow:
+        template_label: "Uang Kas"
+        template_source: "./images/uang kas.png"
+        BackToMenuButton:
+    
+        # -------------- riwayat -------------- #
+        MDGridLayout:
+            cols: 1
+            md_bg_color: (0, 0, 0, 1)
+            size_hint: (1, 0.08)
+            pos_hint: {"center": (0.5, 0.6)}
+            MDLabel:
+                text: "[color=#FFFFFF]Uang Kas[/color]"
+                markup: True
+                halign: "center"
+
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.56)
+            pos_hint: {"center": (0.5, 0.28)}
+            ScrollView:
+                MDList:
+                    id: riwayat_kas
+
+<TagihanWindow>:
+    name: "tagihan"
+    total_tagihan: total_tagihan
+    deadline: deadline
+    TemplateWindow:
+        template_label: "Tagihan"
+        template_source: "./images/tagihan.png"
+        BackToMenuButton:
+
+        # -------------- total tagihan -------------- #
+        MDFloatLayout:
+            cols: 1
+            md_bg_color: (6/255, 127/255, 178/255, 255/255)
+            size_hint: (0.8, 0.2)
+            pos_hint: {"center": (0.5, 0.5)}
+            MDLabel:
+                text: "[color=#ffffff]Total Tagihan[/color]"
+                markup: True
+                pos_hint: {"center": (0.52, 0.8)}
+            MDLabel:
+                id: total_tagihan
+                markup: True
+                pos_hint: {"center": (0.88, 0.5)}
+            MDGridLayout:
+                cols: 1
+                md_bg_color: (0, 0, 0, 1)
+                pos_hint: {"center": (0.5, 0.2)}
+                size_hint: (0.8, 0.2)
+                MDLabel:
+                    id: deadline
+                    markup: True
+                    halign: "center"
+        
+        MDGridLayout:
+            cols: 3
+            size_hint: (0.6, 0.15)
+            pos_hint: {"center": (0.55, 0.25)}
+
+            MDIconButton:
+                icon: "./images/riwayat.png"
+            MDIconButton:
+                icon: "./images/bayar.png"
+            MDIconButton:
+                icon: "./images/cicil.png"
+            
+            MDLabel:
+                text: "Riwayat"
+                halign: "left"
+            MDLabel:
+                text: "Bayar"
+                halign: "left"
+            MDLabel:
+                text: "Cicil"
+                halign: "left"
+
+<VotingWindow>:
+    name: "voting"
+    TemplateWindow:
+        template_label: "Voting"
+        template_source: "./images/voting.png"
+        BackToMenuButton:
+
+        # -------------- voting Pengurus RT/RW -------------- #
+        MDFillRoundFlatButton:
+            text: "Pengurus RT/RW"
+            pos_hint: {"center": (0.5, 0.6)}
+            size_hint: (0.5, 0.1)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.manager.current = "pengurus"
+                root.manager.transition.direction = "left"
+        
+        # -------------- voting Solusi Masalah -------------- #
+        MDFillRoundFlatButton:
+            text: "Solusi Masalah"
+            pos_hint: {"center": (0.5, 0.45)}
+            size_hint: (0.5, 0.1)
+            md_bg_color: (255/255, 145/255, 77/255, 1)
+            on_release:
+                root.manager.current = "solusi"
+                root.manager.transition.direction = "left"
+
+<PengurusVoteWindow>:
+    name: "pengurus"
+    pengurus_list: pengurus_list
+
+    TemplateWindow:
+        template_label: "Pengurus RT/RW"
+        template_source: "./images/voting.png"
+
+        MDIconButton:
+            icon: "arrow-left-circle"
+            pos_hint: {"center": (0.1, 0.9)}
+            on_release:
+                root.manager.current = "voting"
+                root.manager.transition.direction = "right"
+        
+        ScrollView:
+            size_hint: (1, 0.6)
+            pos_hint: {"center": (0.5, 0.3)}
+            MDList:
+                id: pengurus_list
+
+<SolusiVoteWindow>:
+    name: "solusi"
+    # solusi_list: solusi_list
+
+    TemplateWindow:
+        template_label: "Solusi Masalah"
+        template_source: "./images/voting.png"
+
+        MDIconButton:
+            icon: "arrow-left-circle"
+            pos_hint: {"center": (0.1, 0.9)}
+            on_release:
+                root.manager.current = "voting"
+                root.manager.transition.direction = "right"
+
+        MDCheckbox:
+            active: True
+            pos_hint: {"center": (0.5, 0.6)}
+            size_hint: (None, None)
+            size: (sp(32), sp(32))
+            group: "solusi"
+        MDCheckbox:
+            active: False
+            pos_hint: {"center": (0.5, 0.4)}
+            size_hint: (None, None)
+            size: (sp(32), sp(32))
+            group: "solusi"
+
+<DaruratWindow>:
+    name: "darurat"
+    nomor_darurat: nomor_darurat
+    TemplateWindow:
+        template_label: "Darurat"
+        template_source: "./images/darurat.png"
+        BackToMenuButton:
+
+        # -------------- darurat -------------- #
+        MDGridLayout:
+            cols: 1
+            size_hint: (1, 0.6)
+            pos_hint: {"center": (0.5, 0.35)}
+            ScrollView:
+                MDList:
+                    id: nomor_darurat
